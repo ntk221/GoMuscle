@@ -2,6 +2,7 @@ package io_muscle
 
 import (
 	"errors"
+	"io"
 )
 
 // Reader
@@ -35,10 +36,42 @@ var ErrUnexpectedEOF = errors.New("unexpected EOF")
 // コピーされたバイト数と，読み取られたバイトが少なかった場合はエラーを返します
 // バイトが一つも読み取られなかった場合にのみEOFをエラーとして返します
 // minバイト未満を読み取った後にEOFが発生した場合，ReadAtLeastはErrUnexpectedEOFを返します
-// min が bufの長さよりも大きい場合には，ReadAtLeastはErrShirtBufferを返します
-// minがbufの長さよりも大きい場合，ReadAtLeastはErrShortBufferを返します
-// 戻り値として n >= minの場合はerr==nilです
+// min が bufの長さよりも大きい場合には，ReadAtLeastはErrShortBufferを返します
+// 戻り値として n >= minの場合はreturnするerrはnilです
 // r が少なくともminバイトを読み取った後にエラーを返した場合，そのエラーは無視されます
 func ReadAtLeast(r Reader, buf []byte, min int) (n int, err error) {
 	// TODO: implement this !
+	if min > len(buf) {
+		return 0, ErrShortBuffer
+	}
+	n = 0
+	// 2回目のループに入った時には，r.ReadはEOFを返すはず
+	for n < min && err == nil {
+		var nn int
+		nn, err = r.Read(buf[n:])
+		n += nn
+	}
+	if n >= min {
+		err = nil
+	} else if n > 0 && err == io.EOF {
+		err = ErrUnexpectedEOF
+	}
+	return n, err
 }
+
+/*func ReadAtLeast(r Reader, buf []byte, min int) (n int, err error) {
+	if len(buf) < min {
+		return 0, ErrShortBuffer
+	}
+	for n < min && err == nil {
+		var nn int
+		nn, err = r.Read(buf[n:])
+		n += nn
+	}
+	if n >= min {
+		err = nil
+	} else if n > 0 && err == EOF {
+		err = ErrUnexpectedEOF
+	}
+	return
+}*/
