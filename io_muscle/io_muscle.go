@@ -2,7 +2,6 @@ package io_muscle
 
 import (
 	"errors"
-	"testing"
 )
 
 // Reader
@@ -41,34 +40,5 @@ var ErrUnexpectedEOF = errors.New("unexpected EOF")
 // 戻り値として n >= minの場合はerr==nilです
 // r が少なくともminバイトを読み取った後にエラーを返した場合，そのエラーは無視されます
 func ReadAtLeast(r Reader, buf []byte, min int) (n int, err error) {
-	// TODO: implement this!
-}
-
-type testReader struct {
-	data []byte
-}
-
-func (r *testReader) Read(p []byte) (n int, err error) {
-	if len(r.data) == 0 {
-		return 0, ErrUnexpectedEOF
-	}
-	n = copy(p, r.data)
-	r.data = r.data[n:]
-	return n, nil
-}
-
-func TestReadAtLeast(t *testing.T) {
-	// 正常系
-	data := []byte("Hello, world!")
-	r := &testReader{data: data}
-	buf := make([]byte, 10)
-	min := 5
-	n, err := ReadAtLeast()
-	if err != nil {
-
-	}
-	expectedData := data[:min]
-	if string(buf[:n]) != string(expectedData) {
-		t.Errorf("")
-	}
+	// TODO: implement this !
 }
